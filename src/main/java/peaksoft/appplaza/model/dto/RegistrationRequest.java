@@ -11,6 +11,7 @@ public class RegistrationRequest {
     private String lastName;
     private String email;
     private int age;
-    private boolean subscribe;
+    private String password;
 
+    private boolean subscribe;
 }
