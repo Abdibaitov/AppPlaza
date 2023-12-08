@@ -2,16 +2,19 @@ package peaksoft.appplaza.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import peaksoft.appplaza.mapper.LoginMapper;
 import peaksoft.appplaza.mapper.UserMapper;
-import peaksoft.appplaza.model.dto.RegistrationRequest;
-import peaksoft.appplaza.model.dto.RegistrationResponse;
-import peaksoft.appplaza.model.dto.UserResponse;
+import peaksoft.appplaza.model.dto.*;
 import peaksoft.appplaza.model.entities.Role;
 import peaksoft.appplaza.model.entities.User;
 import peaksoft.appplaza.repository.RoleRepository;
 import peaksoft.appplaza.repository.UserRepository;
+import peaksoft.appplaza.security.jwt.JwtFilter;
+import peaksoft.appplaza.security.jwt.JwtUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,9 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final LoginMapper loginMapper;
 
 //    @Autowired
 //    public UserService(UserRepository repository, UserMapper userMapper) {  @RequiredArgsConstructor ушинтип жазсак башына
@@ -36,7 +42,7 @@ public class UserService {
         if (user.getName().length() < 2 || user.getLastName().length() < 2) {
             throw new RuntimeException("User's name or last name must be more 2 simbol ! ");
         }
-        if(!user.getEmail().contains("@")){
+        if (!user.getEmail().contains("@")) {
             throw new RuntimeException("your email don't have ' @ '");
         }
 
@@ -60,6 +66,15 @@ public class UserService {
         repository.save(user);
         return userMapper.mapToResponse(user);
 
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        System.out.println(request.getEmail());
+        System.out.println(request.getPassword());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        User user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Not found"));
+        String jwt = jwtUtil.generateToken(user);
+        return loginMapper.mapToResponse(jwt,user);
     }
 
     public UserResponse findById(Long id) {

@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import peaksoft.appplaza.model.dto.RegistrationRequest;
-import peaksoft.appplaza.model.dto.RegistrationResponse;
-import peaksoft.appplaza.model.dto.UserResponse;
+import peaksoft.appplaza.model.dto.*;
 import peaksoft.appplaza.service.UserService;
 
 import java.util.List;
@@ -21,6 +19,10 @@ public class UserController {
     public ResponseEntity<RegistrationResponse> registration(@RequestBody RegistrationRequest request) {
         RegistrationResponse response = userService.registration(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    @PostMapping("/sign-in")
+    public LoginResponse login(@RequestBody LoginRequest request){
+        return userService.login(request);
     }
 
     @GetMapping("/{id}")
