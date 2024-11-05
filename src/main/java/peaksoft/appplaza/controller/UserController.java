@@ -21,6 +21,7 @@ public class UserController {
     public ResponseEntity<RegistrationResponse> registration(@RequestBody RegistrationRequest request) {
         RegistrationResponse response = userService.registration(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+
     }
 
     @GetMapping("/{id}")
